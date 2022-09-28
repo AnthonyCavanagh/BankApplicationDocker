@@ -1,0 +1,76 @@
+version: "3"
+services:
+  mongo-container:
+    image: mongo:latest
+    container_name: "mongo-container"
+    ports:
+      - 27017:27017
+    networks:
+      - banking-network
+    volumes:
+      - mongodb_data_container:/data/db
+  zuul-service:
+    image: zuul-service
+    container_name: zuul-service
+    build:
+      context: ../../zuul-service
+      dockerfile: local.dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - eureka.client.service-url.defaultZone=http://172.21.0.2:8761/eureka
+    networks:
+      - banking-network
+  statement-service:
+    image: statement-service
+    container_name: statement-service
+    build:
+      context: ../../statement-service
+      dockerfile: local.dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - zuul-service
+    environment:
+      - eureka.client.service-url.defaultZone=http://172.21.0.2:8761/eureka
+    networks:
+      - banking-network
+  account-service:
+    image: account-service
+    container_name: account-service
+    build:
+      context: ../../account-service
+      dockerfile: local.dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - zuul-service
+    environment:
+      - eureka.client.service-url.defaultZone=http://172.21.0.2:8761/eureka
+    networks:
+      - banking-network
+  transaction-service:
+    image: transaction-service
+    container_name: transaction-service
+    build:
+      context: ../../transaction-service
+      dockerfile: local.dockerfile
+    ports:
+      - "8083:8083"
+    depends_on:
+      - zuul-service
+      - mongo-container
+    links:
+      - mongo-container
+    environment:
+      - eureka.client.service-url.defaultZone=http://172.21.0.2:8761/eureka
+    networks:
+      - banking-network
+
+networks:
+  banking-network:
+    external:
+      name: banking-network
+
+volumes:
+  mongodb_data_container:

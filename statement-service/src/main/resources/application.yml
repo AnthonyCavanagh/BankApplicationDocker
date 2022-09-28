@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: statement-service
+server:
+  port: '8081'
+
+eureka:
+  client:
+    instance:
+      preferIpAddress: 'true'
+    fetchRegistry: 'true'
+    registerWithEureka: 'true'
+    serviceUrl:
+      defaultZone: http://172.21.0.2:8761/eureka

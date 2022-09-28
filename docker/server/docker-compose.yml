@@ -1,0 +1,17 @@
+version: "3"
+services:
+  eureka-service:
+    image: eureka-service
+    container_name: eureka-service
+    build:
+      context: ../../eureka-service
+      dockerfile: local.dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - banking-network
+
+networks:
+  banking-network:
+    external:
+      name: banking-network
